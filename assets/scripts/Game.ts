@@ -1,9 +1,11 @@
 import { App } from "./app/App";
 import { UICfg } from "./cfg/UICfg";
+import { SoundMgr } from "./mgrs/SoundMgr";
 import { httpClient } from "./platform/HttpClient";
 import { HttpUrl } from "./platform/HttpUrl";
 import { Save } from "./saveManager/Save";
 import { SaveManager } from "./saveManager/SaveManager";
+import { UIUtils } from "./ui/UIUtils";
 import { objectUtils } from "./utils/object-utils";
 
 const Fruit = cc.Class({
@@ -40,42 +42,89 @@ export default class Game extends cc.Component {
     @property(cc.Prefab)
     private juicePrefab = null;
 
-    @property(cc.AudioClip)
-    private boomAudio: cc.AudioClip = null;
-
-    @property(cc.AudioClip)
-    private waterAudio: cc.AudioClip = null;
-
-    @property(cc.AudioClip)
-    private knockAudio: cc.AudioClip = null;
-
     @property(cc.Node)
     private fruitsNode: cc.Node = null;
 
     @property(cc.Node)
     private juicesNode: cc.Node = null;
 
-    private isCreating: boolean;
-    private fruitCount: number;
-    private currentFruit: cc.Node;
+    @property(cc.Label)
+    private lbScores: cc.Label = null;
+
+    @property(cc.RichText)
+    private lbScoreTip: cc.RichText = null;
+
+    @property(cc.Node)
+    private bottomNode: cc.Node = null;
+
+    @property(cc.Button)
+    private btnOpenWheel:cc.Button = null;
+
+    private isCreating: boolean;        //是否在创建球中
+
+    private isLjIng: boolean;            //是否在连击中
+
+    private fruitCount: number;         //场上总共的数量
+
+    private currentFruit: cc.Node;      //当前水果    
+
+    private scoresTimer = null;          //连击计时器
+
+    private scoresTime = 1;             //连击有效时间
+
+    private ljScores = 0;               //连击分数
+
+    private ljCount = 0;                //连击次数
+
+    private _curScores = 0;             //当前总分
+
+    public set curScores(value: number) {
+        this._curScores = value;
+        if(this.targetScores > this.curScores){
+            this.lbScores.string = `${this.curScores}/${this.targetScores}`;
+            this.lbScoreTip.string = `再得<color = #CF5B5B>${this.targetScores - this.curScores}</c>分，即可获得额外提现机会`;
+        }
+        else{
+            this.lbScores.string = "可提现";
+            this.lbScoreTip.string = "";
+        }
+    }
+
+    public get curScores(): number {
+        return this._curScores;
+    }
+
+
+    private targetScores = 700;         //下一个目标分数    
+
 
     onLoad() {
-        this.initPhysics()
+        App.uiCfgMgr.initByCfg(UICfg);
 
-        this.isCreating = false;
-        this.fruitCount = 0;
+        UIUtils.addClickEvent(this.btnOpenWheel.node, ()=>{
+            App.uiMgr.openUI(UICfg.PannelWheel.name);
+        }, this);
 
         // 监听点击事件 todo 是否能够注册全局事件
         this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
 
-        this.initOneFruit()
+
+        this.initGame();
+
 
         setInterval(() => {
             //console.log("保存游戏");
             this.saveGame();
         }, 10000)
         //console.log("读取游戏");
-        this.readGame();        
+        this.readGame();
+    }
+
+    initGame() {
+        this.isCreating = false;
+        this.isLjIng = false;
+        this.initPhysics();
+        this.initOneFruit();
     }
 
     // 开启物理引擎和碰撞检测
@@ -88,7 +137,7 @@ export default class Game extends cc.Component {
 
         // 碰撞检测
         const collisionManager = cc.director.getCollisionManager();
-        collisionManager.enabled = true
+        collisionManager.enabled = true;
 
         // 设置四周的碰撞区域
         let width = this.node.width;
@@ -107,7 +156,7 @@ export default class Game extends cc.Component {
             collider.size.height = height;
         }
 
-        _addBound(node, 0, -height / 2, width, 1);
+        _addBound(node, 0, -height / 2 + this.bottomNode.height, width, 1);
         _addBound(node, 0, height / 2, width, 1);
         _addBound(node, -width / 2, 0, 1, height);
         _addBound(node, width / 2, 0, 1, height);
@@ -122,7 +171,7 @@ export default class Game extends cc.Component {
 
     // 监听屏幕点击
     onTouchStart(e) {
-        if (this.isCreating) return
+        if (this.isCreating || this.isLjIng) return
         this.isCreating = true
         const { width, height } = this.node
 
@@ -142,7 +191,7 @@ export default class Game extends cc.Component {
             this.scheduleOnce(() => {
                 const nextId = this.getNextFruitId()
                 this.initOneFruit(nextId)
-                this.isCreating = false
+                this.isCreating = false;
             }, 1)
         }))
 
@@ -175,7 +224,7 @@ export default class Game extends cc.Component {
         fruit.getComponent(cc.PhysicsCircleCollider).radius = 0
 
         this.fruitsNode.addChild(fruit);
-        fruit.scale = 0.6
+        fruit.scale = 0.6;
 
         // 有Fruit组件传入
         fruit.on('sameContact', this.onSameFruitContact.bind(this))
@@ -227,13 +276,55 @@ export default class Game extends cc.Component {
             // todo 合成两个西瓜
             console.log(' todo 合成两个西瓜 还没有实现哦~ ')
         }
+
+        if (!this.scoresTimer) {
+            this.initLjTime();
+        }
+        this.setLjTimer();
+        let oneljScores = this.getljScores(nextId);
+        this.ljCount++;
+        this.ljScores += oneljScores;
+        this.curScores += this.ljScores;
     }
+
+    //设置连击初始数据
+    private initLjTime() {
+        this.isLjIng = true;
+        this.ljCount = 0;
+    }
+
+    //重置连击计时器
+    private setLjTimer() {
+        this.scoresTimer = setTimeout(() => {
+            this.closeLjTime();
+        }, this.scoresTime * 1000);
+    }
+
+    //关闭连击计时器
+    private closeLjTime() {
+        clearTimeout(this.scoresTimer);
+        this.ljScores = 0;
+        this.scoresTimer = null;
+        this.isLjIng = false;
+        if (this.curScores >= this.targetScores) {
+
+        }
+    }
+
+    //获得连击分数
+    private getljScores(lv: number): number {
+        return 1;
+    }
+
 
     // 合并时的动画效果
     createFruitJuice(id, pos, n) {
         // 播放合并的声音
-        cc.audioEngine.play(this.boomAudio, false, 1);
-        cc.audioEngine.play(this.waterAudio, false, 1);
+        // cc.audioEngine.play(this.boomAudio, false, 1);
+        // cc.audioEngine.play(this.waterAudio, false, 1);
+
+        App.soundMgr.playEffect("common/sounds/boom");
+        App.soundMgr.playEffect("common/sounds/water");
 
         // 展示动画
         let juice = cc.instantiate(this.juicePrefab);
@@ -256,6 +347,8 @@ export default class Game extends cc.Component {
             }
         }
         SaveManager.Instance().setItem(Save.fruitsPos, fruitPosArray);
+
+        SaveManager.Instance().setItem(Save.gameScores, this.curScores);
     }
 
     //游戏读取
@@ -265,6 +358,9 @@ export default class Game extends cc.Component {
             let data = gameData[i];
             this.startFruitPhysics(this.createFruitOnPos(data.pos.x, data.pos.y, data.id))
         }
+
+        this.fruitCount = gameData.length;
+        this.curScores = SaveManager.Instance().getItem(Save.gameScores);
     }
 
 }

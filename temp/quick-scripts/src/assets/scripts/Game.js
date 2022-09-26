@@ -23,8 +23,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var App_1 = require("./app/App");
+var UICfg_1 = require("./cfg/UICfg");
 var Save_1 = require("./saveManager/Save");
 var SaveManager_1 = require("./saveManager/SaveManager");
+var UIUtils_1 = require("./ui/UIUtils");
 var Fruit = cc.Class({
     name: 'FruitItem',
     properties: {
@@ -49,27 +52,59 @@ var Game = /** @class */ (function (_super) {
         _this.juices = [];
         _this.fruitPrefab = null;
         _this.juicePrefab = null;
-        _this.boomAudio = null;
-        _this.waterAudio = null;
-        _this.knockAudio = null;
         _this.fruitsNode = null;
         _this.juicesNode = null;
+        _this.lbScores = null;
+        _this.lbScoreTip = null;
+        _this.bottomNode = null;
+        _this.btnOpenWheel = null;
+        _this.scoresTimer = null; //连击计时器
+        _this.scoresTime = 1; //连击有效时间
+        _this.ljScores = 0; //连击分数
+        _this.ljCount = 0; //连击次数
+        _this._curScores = 0; //当前总分
+        _this.targetScores = 700; //下一个目标分数    
         return _this;
     }
+    Object.defineProperty(Game.prototype, "curScores", {
+        get: function () {
+            return this._curScores;
+        },
+        set: function (value) {
+            this._curScores = value;
+            if (this.targetScores > this.curScores) {
+                this.lbScores.string = this.curScores + "/" + this.targetScores;
+                this.lbScoreTip.string = "\u518D\u5F97<color = #CF5B5B>" + (this.targetScores - this.curScores) + "</c>\u5206\uFF0C\u5373\u53EF\u83B7\u5F97\u989D\u5916\u63D0\u73B0\u673A\u4F1A";
+            }
+            else {
+                this.lbScores.string = "可提现";
+                this.lbScoreTip.string = "";
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
     Game.prototype.onLoad = function () {
         var _this = this;
-        this.initPhysics();
-        this.isCreating = false;
-        this.fruitCount = 0;
+        App_1.App.uiCfgMgr.initByCfg(UICfg_1.UICfg);
+        UIUtils_1.UIUtils.addClickEvent(this.btnOpenWheel.node, function () {
+            App_1.App.uiMgr.openUI(UICfg_1.UICfg.PannelWheel.name);
+        }, this);
         // 监听点击事件 todo 是否能够注册全局事件
         this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
-        this.initOneFruit();
+        this.initGame();
         setInterval(function () {
             //console.log("保存游戏");
             _this.saveGame();
         }, 10000);
         //console.log("读取游戏");
         this.readGame();
+    };
+    Game.prototype.initGame = function () {
+        this.isCreating = false;
+        this.isLjIng = false;
+        this.initPhysics();
+        this.initOneFruit();
     };
     // 开启物理引擎和碰撞检测
     Game.prototype.initPhysics = function () {
@@ -94,7 +129,7 @@ var Game = /** @class */ (function (_super) {
             collider.size.width = width;
             collider.size.height = height;
         };
-        _addBound(node, 0, -height / 2, width, 1);
+        _addBound(node, 0, -height / 2 + this.bottomNode.height, width, 1);
         _addBound(node, 0, height / 2, width, 1);
         _addBound(node, -width / 2, 0, 1, height);
         _addBound(node, width / 2, 0, 1, height);
@@ -108,7 +143,7 @@ var Game = /** @class */ (function (_super) {
     // 监听屏幕点击
     Game.prototype.onTouchStart = function (e) {
         var _this = this;
-        if (this.isCreating)
+        if (this.isCreating || this.isLjIng)
             return;
         this.isCreating = true;
         var _a = this.node, width = _a.width, height = _a.height;
@@ -197,12 +232,47 @@ var Game = /** @class */ (function (_super) {
             // todo 合成两个西瓜
             console.log(' todo 合成两个西瓜 还没有实现哦~ ');
         }
+        if (!this.scoresTimer) {
+            this.initLjTime();
+        }
+        this.setLjTimer();
+        var oneljScores = this.getljScores(nextId);
+        this.ljCount++;
+        this.ljScores += oneljScores;
+        this.curScores += this.ljScores;
+    };
+    //设置连击初始数据
+    Game.prototype.initLjTime = function () {
+        this.isLjIng = true;
+        this.ljCount = 0;
+    };
+    //重置连击计时器
+    Game.prototype.setLjTimer = function () {
+        var _this = this;
+        this.scoresTimer = setTimeout(function () {
+            _this.closeLjTime();
+        }, this.scoresTime * 1000);
+    };
+    //关闭连击计时器
+    Game.prototype.closeLjTime = function () {
+        clearTimeout(this.scoresTimer);
+        this.ljScores = 0;
+        this.scoresTimer = null;
+        this.isLjIng = false;
+        if (this.curScores >= this.targetScores) {
+        }
+    };
+    //获得连击分数
+    Game.prototype.getljScores = function (lv) {
+        return 1;
     };
     // 合并时的动画效果
     Game.prototype.createFruitJuice = function (id, pos, n) {
         // 播放合并的声音
-        cc.audioEngine.play(this.boomAudio, false, 1);
-        cc.audioEngine.play(this.waterAudio, false, 1);
+        // cc.audioEngine.play(this.boomAudio, false, 1);
+        // cc.audioEngine.play(this.waterAudio, false, 1);
+        App_1.App.soundMgr.playEffect("common/sounds/boom");
+        App_1.App.soundMgr.playEffect("common/sounds/water");
         // 展示动画
         var juice = cc.instantiate(this.juicePrefab);
         this.juicesNode.addChild(juice);
@@ -221,6 +291,7 @@ var Game = /** @class */ (function (_super) {
             }
         }
         SaveManager_1.SaveManager.Instance().setItem(Save_1.Save.fruitsPos, fruitPosArray);
+        SaveManager_1.SaveManager.Instance().setItem(Save_1.Save.gameScores, this.curScores);
     };
     //游戏读取
     Game.prototype.readGame = function () {
@@ -229,6 +300,8 @@ var Game = /** @class */ (function (_super) {
             var data = gameData[i];
             this.startFruitPhysics(this.createFruitOnPos(data.pos.x, data.pos.y, data.id));
         }
+        this.fruitCount = gameData.length;
+        this.curScores = SaveManager_1.SaveManager.Instance().getItem(Save_1.Save.gameScores);
     };
     __decorate([
         property(Fruit)
@@ -243,20 +316,23 @@ var Game = /** @class */ (function (_super) {
         property(cc.Prefab)
     ], Game.prototype, "juicePrefab", void 0);
     __decorate([
-        property(cc.AudioClip)
-    ], Game.prototype, "boomAudio", void 0);
-    __decorate([
-        property(cc.AudioClip)
-    ], Game.prototype, "waterAudio", void 0);
-    __decorate([
-        property(cc.AudioClip)
-    ], Game.prototype, "knockAudio", void 0);
-    __decorate([
         property(cc.Node)
     ], Game.prototype, "fruitsNode", void 0);
     __decorate([
         property(cc.Node)
     ], Game.prototype, "juicesNode", void 0);
+    __decorate([
+        property(cc.Label)
+    ], Game.prototype, "lbScores", void 0);
+    __decorate([
+        property(cc.RichText)
+    ], Game.prototype, "lbScoreTip", void 0);
+    __decorate([
+        property(cc.Node)
+    ], Game.prototype, "bottomNode", void 0);
+    __decorate([
+        property(cc.Button)
+    ], Game.prototype, "btnOpenWheel", void 0);
     Game = __decorate([
         ccclass
     ], Game);

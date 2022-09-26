@@ -27,6 +27,7 @@ require('./assets/scripts/mgrs/UICfgMgr');
 require('./assets/scripts/mgrs/UIMgr');
 require('./assets/scripts/misc/InterfaceDef');
 require('./assets/scripts/pannels/PannelAlert1');
+require('./assets/scripts/pannels/PannelWheel');
 require('./assets/scripts/platform/Config');
 require('./assets/scripts/platform/HttpClient');
 require('./assets/scripts/platform/HttpUrl');

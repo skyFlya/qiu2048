@@ -58,5 +58,13 @@ class SaveConfig {
         type: "object",
         default: []
     }
+
+    /**当前游戏分数 */
+    gameScores: SaveItemConig = {
+        key: "gameScores",
+        type: "number",
+        default: 0
+    }
+
 }
 export const Save: SaveConfig = new SaveConfig();

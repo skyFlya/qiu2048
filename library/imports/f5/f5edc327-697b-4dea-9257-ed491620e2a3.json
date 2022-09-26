@@ -1,0 +1,28 @@
+{
+  "__type__": "cc.SpriteFrame",
+  "content": {
+    "name": "newBigWheel_chou",
+    "texture": "83923fdc-b4bc-4139-85e5-91bc49b2314d",
+    "atlas": "",
+    "rect": [
+      0,
+      0,
+      188,
+      188
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "originalSize": [
+      188,
+      188
+    ],
+    "capInsets": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

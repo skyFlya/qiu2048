@@ -49,6 +49,12 @@ var SaveConfig = /** @class */ (function () {
             type: "object",
             default: []
         };
+        /**当前游戏分数 */
+        this.gameScores = {
+            key: "gameScores",
+            type: "number",
+            default: 0
+        };
     }
     return SaveConfig;
 }());

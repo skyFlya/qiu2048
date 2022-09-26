@@ -1,13 +1,12 @@
 [
   {
     "__type__": "cc.SceneAsset",
-    "_name": "game",
+    "_name": "",
     "_objFlags": 0,
     "_native": "",
     "scene": {
       "__id__": 1
-    },
-    "asyncLoadAssets": false
+    }
   },
   {
     "__type__": "cc.Scene",
@@ -2125,7 +2124,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "btnOpenWheel",
+    "_name": "New Button",
     "_objFlags": 0,
     "_parent": {
       "__id__": 37
@@ -2624,7 +2623,7 @@
     "_groupIndex": 0,
     "groupIndex": 0,
     "showInEditor": false,
-    "_id": "04sFGV/kNBBatJbvJOR8EK"
+    "_id": "35W9fHP45CTKo2k85p0Re5"
   },
   {
     "__type__": "cc.Label",
@@ -2658,7 +2657,7 @@
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 0,
-    "_id": "d3EnyKcxVI8L40VjMzlQHc"
+    "_id": "abLQcwTWdC2qIjavPT+d4n"
   },
   {
     "__type__": "cc.PrivateNode",
@@ -2721,7 +2720,7 @@
     "_groupIndex": 0,
     "groupIndex": 0,
     "showInEditor": false,
-    "_id": "25F40bDFhIF4/3ifXecYhM"
+    "_id": "90s+hBGq1JFq2VRVBe61Q9"
   },
   {
     "__type__": "cc.Label",
@@ -2755,7 +2754,7 @@
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_N$cacheMode": 0,
-    "_id": "f29Q0UURdDYJgDzMFdQd+J"
+    "_id": "6ehFKoZG5GTry/zaByHc1D"
   },
   {
     "__type__": "cc.RichText",
@@ -3061,9 +3060,6 @@
     },
     "bottomNode": {
       "__id__": 37
-    },
-    "btnOpenWheel": {
-      "__id__": 43
     },
     "_id": "dbV9lsqRZFxII5BD3UYDy8"
   },
