@@ -500,8 +500,8 @@
     "relativePath": "model\\primitives.fbx"
   },
   "27b68a1b-1c93-430d-8ad1-65eaa524f1ca": {
-    "asset": 1664156577442,
-    "meta": 1664157589479,
+    "asset": 1664175641523,
+    "meta": 1664242579089,
     "relativePath": "audio"
   },
   "f44b8de0-c590-4efa-8818-d2e8dc5d1219": {
@@ -515,8 +515,8 @@
     "relativePath": "resources\\common\\sounds\\boom.mp3"
   },
   "fa19332b-97ad-4d3c-abb8-67c5765d7ce3": {
-    "asset": 1664188085309,
-    "meta": 1664188085318,
+    "asset": 1664243570448,
+    "meta": 1664243570459,
     "relativePath": "scene\\game.fire"
   },
   "b87f0330-49ce-47e1-9263-8dc3a7ad1822": {
@@ -745,8 +745,8 @@
     "relativePath": "prefab\\juice.prefab"
   },
   "52de34b1-f572-4b7e-bb21-72b316c4aa12": {
-    "asset": 1664156577771,
-    "meta": 1664157589483,
+    "asset": 1664183309017,
+    "meta": 1664242579093,
     "relativePath": "scripts"
   },
   "0f9ac692-62f9-4c01-a087-faf2d88fc5b2": {
@@ -784,19 +784,14 @@
     "meta": 1663841681742,
     "relativePath": "scripts\\platform\\TestHttp.ts"
   },
-  "7442e4dd-bd0d-4a9e-af41-d5c6d2d93422": {
-    "asset": 1663900591023,
-    "meta": 1663900611517,
-    "relativePath": "scripts\\platform\\Config.ts"
-  },
   "e0f91d77-e917-47a4-8166-c4de00b5c9aa": {
     "asset": 1663900610748,
     "meta": 1663900611523,
     "relativePath": "scripts\\platform\\HttpUrl.ts"
   },
   "a41fa387-3288-41fb-aa86-3a98e2f1d2ce": {
-    "asset": 1664156577484,
-    "meta": 1664157589480,
+    "asset": 1664176525956,
+    "meta": 1664242579090,
     "relativePath": "resources"
   },
   "0815676b-beae-4c8f-ac7e-3fa698d9cf34": {
@@ -805,8 +800,8 @@
     "relativePath": "resources\\prefabs"
   },
   "4a40c26e-493d-4d9e-b5d7-d98fe4eeb171": {
-    "asset": 1664156578009,
-    "meta": 1664157589490,
+    "asset": 1664187342388,
+    "meta": 1664242579097,
     "relativePath": "textures"
   },
   "50d8addc-a1fe-4a44-b897-6223aa1d1bad": {
@@ -885,8 +880,8 @@
     "relativePath": "scripts\\app"
   },
   "150ce5d7-83f2-4f4f-b96a-e564ba132678": {
-    "asset": 1664156577582,
-    "meta": 1664157589485,
+    "asset": 1664187488693,
+    "meta": 1664242579095,
     "relativePath": "scripts\\cfg"
   },
   "6e38b4c4-611e-4d90-84af-20270bbad79a": {
@@ -940,13 +935,13 @@
     "relativePath": "scripts\\cfg\\UIZIndexCfg.ts"
   },
   "65dbd79c-89d5-4dda-b9fe-bb2479983746": {
-    "asset": 1664156577471,
-    "meta": 1664157589481,
+    "asset": 1664175630198,
+    "meta": 1664242579091,
     "relativePath": "resources\\common"
   },
   "1103632b-27b2-4d42-ac75-000113ea018d": {
-    "asset": 1664156577482,
-    "meta": 1664157589481,
+    "asset": 1664186844754,
+    "meta": 1664242579092,
     "relativePath": "resources\\common\\pannels"
   },
   "f22b6ba7-2427-4943-bb4f-285c166e6073": {
@@ -955,8 +950,8 @@
     "relativePath": "resources\\common\\pannels\\PannelAlert1.prefab"
   },
   "195ca9aa-2d7c-466b-915c-0bd5d540fafa": {
-    "asset": 1664156577665,
-    "meta": 1664157589487,
+    "asset": 1664185545399,
+    "meta": 1664242579096,
     "relativePath": "scripts\\pannels"
   },
   "3b5fea82-f26a-4db4-a2e6-3e73b1612e1c": {
@@ -1020,13 +1015,13 @@
     "relativePath": "scripts\\mgrs\\SoundMgr.ts"
   },
   "e8dc2037-ee21-4705-971a-603727732c45": {
-    "asset": 1664175624071,
-    "meta": 1664175624072,
+    "asset": 1664175641523,
+    "meta": 1664242579093,
     "relativePath": "resources\\common\\sounds"
   },
   "b55b3629-2bc9-4ea0-832a-52da7fc2d08a": {
-    "asset": 1664176012325,
-    "meta": 1664176012327,
+    "asset": 1664187488733,
+    "meta": 1664242579095,
     "relativePath": "scripts\\effect"
   },
   "4664dff8-188b-4b68-8929-b543c4d1b884": {
@@ -1045,13 +1040,13 @@
     "relativePath": "resources\\common\\pannels\\PannelWheel.prefab"
   },
   "eb886c49-ff4c-452f-8b0d-fc11c1c2e206": {
-    "asset": 1664187340547,
-    "meta": 1664187340549,
+    "asset": 1664187367771,
+    "meta": 1664242579097,
     "relativePath": "textures\\pannel"
   },
   "2fcf581f-4efb-4cb9-8ee0-8758824a7094": {
-    "asset": 1664187349316,
-    "meta": 1664187349317,
+    "asset": 1664187500762,
+    "meta": 1664242579098,
     "relativePath": "textures\\pannel\\PannelWheel"
   },
   "83923fdc-b4bc-4139-85e5-91bc49b2314d": {
@@ -1069,14 +1064,34 @@
     "meta": 1664187500774,
     "relativePath": "textures\\pannel\\PannelWheel\\newBigWheel_btnChou.png"
   },
-  "56c2804e-299e-404b-a4b8-b1ba444194c5": {
-    "asset": 1664188068775,
-    "meta": 1664188070142,
-    "relativePath": "scripts\\Game.ts"
-  },
   "caa92ff9-1154-4951-8bff-56dfb888e825": {
     "asset": 1664188207410,
     "meta": 1664188208977,
     "relativePath": "scripts\\pannels\\PannelWheel.ts"
+  },
+  "69fd9c6c-b049-4ab4-a166-9f7b0a3f9c12": {
+    "asset": 1664243669130,
+    "meta": 1664243669130,
+    "relativePath": "resources\\common\\pannels\\PannelCashOut.prefab"
+  },
+  "8798eb60-c989-437a-8070-99ab113bc261": {
+    "asset": 1664243626858,
+    "meta": 1664243628583,
+    "relativePath": "scripts\\pannels\\PannelCashOut.ts"
+  },
+  "56c2804e-299e-404b-a4b8-b1ba444194c5": {
+    "asset": 1664258634951,
+    "meta": 1664258636151,
+    "relativePath": "scripts\\Game.ts"
+  },
+  "1c3d9f98-34b6-43c4-a491-7710eebc63d6": {
+    "asset": 1664262309860,
+    "meta": 1664263263313,
+    "relativePath": "scripts\\mgrs\\DataMgr.ts"
+  },
+  "7442e4dd-bd0d-4a9e-af41-d5c6d2d93422": {
+    "asset": 1664262924898,
+    "meta": 1664263263331,
+    "relativePath": "scripts\\platform\\Config.ts"
   }
 }

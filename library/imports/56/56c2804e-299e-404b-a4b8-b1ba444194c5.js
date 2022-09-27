@@ -58,6 +58,7 @@ var Game = /** @class */ (function (_super) {
         _this.lbScoreTip = null;
         _this.bottomNode = null;
         _this.btnOpenWheel = null;
+        _this.creatY = 400; //生产球的位置
         _this.scoresTimer = null; //连击计时器
         _this.scoresTime = 1; //连击有效时间
         _this.ljScores = 0; //连击分数
@@ -88,7 +89,8 @@ var Game = /** @class */ (function (_super) {
         var _this = this;
         App_1.App.uiCfgMgr.initByCfg(UICfg_1.UICfg);
         UIUtils_1.UIUtils.addClickEvent(this.btnOpenWheel.node, function () {
-            App_1.App.uiMgr.openUI(UICfg_1.UICfg.PannelWheel.name);
+            //App.uiMgr.openUI(UICfg.PannelWheel.name);
+            _this.initGame();
         }, this);
         // 监听点击事件 todo 是否能够注册全局事件
         this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -101,10 +103,27 @@ var Game = /** @class */ (function (_super) {
         this.readGame();
     };
     Game.prototype.initGame = function () {
+        if (this.currentFruit) {
+            this.currentFruit.destroy();
+        }
+        if (this.fruitsNode.childrenCount > 0) {
+            this.fruitsNode.destroyAllChildren();
+        }
+        if (this.juicesNode.childrenCount > 0) {
+            this.juicesNode.destroyAllChildren();
+        }
         this.isCreating = false;
         this.isLjIng = false;
         this.initPhysics();
         this.initOneFruit();
+    };
+    Game.prototype.checkGameOver = function () {
+        var endFruit = this.fruitsNode.children[this.fruitsNode.childrenCount - 1];
+        if (endFruit && endFruit.y >= this.creatY - 100) {
+            this.initGame();
+            return true;
+        }
+        return false;
     };
     // 开启物理引擎和碰撞检测
     Game.prototype.initPhysics = function () {
@@ -138,12 +157,12 @@ var Game = /** @class */ (function (_super) {
     Game.prototype.initOneFruit = function (id) {
         if (id === void 0) { id = 1; }
         this.fruitCount++;
-        this.currentFruit = this.createFruitOnPos(0, 400, id);
+        this.currentFruit = this.createFruitOnPos(0, this.creatY, id);
     };
     // 监听屏幕点击
     Game.prototype.onTouchStart = function (e) {
         var _this = this;
-        if (this.isCreating || this.isLjIng)
+        if (this.isCreating)
             return;
         this.isCreating = true;
         var _a = this.node, width = _a.width, height = _a.height;
@@ -157,9 +176,11 @@ var Game = /** @class */ (function (_super) {
             _this.startFruitPhysics(fruit);
             // 1s后重新生成一个
             _this.scheduleOnce(function () {
-                var nextId = _this.getNextFruitId();
-                _this.initOneFruit(nextId);
-                _this.isCreating = false;
+                if (!_this.checkGameOver()) {
+                    var nextId = _this.getNextFruitId();
+                    _this.initOneFruit(nextId);
+                    _this.isCreating = false;
+                }
             }, 1);
         }));
         fruit.runAction(action);

@@ -58,7 +58,9 @@ export default class Game extends cc.Component {
     private bottomNode: cc.Node = null;
 
     @property(cc.Button)
-    private btnOpenWheel:cc.Button = null;
+    private btnOpenWheel: cc.Button = null;
+
+    private creatY: number = 400;       //生产球的位置
 
     private isCreating: boolean;        //是否在创建球中
 
@@ -80,11 +82,11 @@ export default class Game extends cc.Component {
 
     public set curScores(value: number) {
         this._curScores = value;
-        if(this.targetScores > this.curScores){
+        if (this.targetScores > this.curScores) {
             this.lbScores.string = `${this.curScores}/${this.targetScores}`;
             this.lbScoreTip.string = `再得<color = #CF5B5B>${this.targetScores - this.curScores}</c>分，即可获得额外提现机会`;
         }
-        else{
+        else {
             this.lbScores.string = "可提现";
             this.lbScoreTip.string = "";
         }
@@ -101,8 +103,9 @@ export default class Game extends cc.Component {
     onLoad() {
         App.uiCfgMgr.initByCfg(UICfg);
 
-        UIUtils.addClickEvent(this.btnOpenWheel.node, ()=>{
-            App.uiMgr.openUI(UICfg.PannelWheel.name);
+        UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
+            //App.uiMgr.openUI(UICfg.PannelWheel.name);
+            this.initGame();
         }, this);
 
         // 监听点击事件 todo 是否能够注册全局事件
@@ -121,10 +124,28 @@ export default class Game extends cc.Component {
     }
 
     initGame() {
+        if (this.currentFruit) {
+            this.currentFruit.destroy();
+        }
+        if (this.fruitsNode.childrenCount > 0) {
+            this.fruitsNode.destroyAllChildren();
+        }
+        if (this.juicesNode.childrenCount > 0) {
+            this.juicesNode.destroyAllChildren();
+        }
         this.isCreating = false;
         this.isLjIng = false;
         this.initPhysics();
         this.initOneFruit();
+    }
+
+    checkGameOver() {
+        let endFruit = this.fruitsNode.children[this.fruitsNode.childrenCount - 1];        
+        if (endFruit && endFruit.y >= this.creatY - 100) {
+            this.initGame();
+            return true;
+        }
+        return false;
     }
 
     // 开启物理引擎和碰撞检测
@@ -166,12 +187,12 @@ export default class Game extends cc.Component {
 
     initOneFruit(id = 1) {
         this.fruitCount++;
-        this.currentFruit = this.createFruitOnPos(0, 400, id);
+        this.currentFruit = this.createFruitOnPos(0, this.creatY, id);
     }
 
     // 监听屏幕点击
     onTouchStart(e) {
-        if (this.isCreating || this.isLjIng) return
+        if (this.isCreating) return
         this.isCreating = true
         const { width, height } = this.node
 
@@ -189,9 +210,11 @@ export default class Game extends cc.Component {
 
             // 1s后重新生成一个
             this.scheduleOnce(() => {
-                const nextId = this.getNextFruitId()
-                this.initOneFruit(nextId)
-                this.isCreating = false;
+                if (!this.checkGameOver()) {
+                    const nextId = this.getNextFruitId()
+                    this.initOneFruit(nextId)
+                    this.isCreating = false;
+                }
             }, 1)
         }))
 
@@ -240,14 +263,14 @@ export default class Game extends cc.Component {
     }
 
     // 在指定位置生成水果
-    createFruitOnPos(x, y, type = 1) {
+    createFruitOnPos(x, y, type = 1) {        
         const fruit = this.createOneFruit(type)
         fruit.setPosition(cc.v2(x, y));
         return fruit
     }
 
     // 两个水果碰撞
-    onSameFruitContact({ self, other }) {
+    onSameFruitContact({ self, other }) {        
         other.node.off('sameContact') // 两个node都会触发，todo 看看有没有其他方法只展示一次的
 
         const id = other.getComponent('Fruit').id
