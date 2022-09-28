@@ -83,7 +83,7 @@ export default class Juice extends cc.Component {
         })))
 
         setTimeout(() => {
-            this.node.destroy();
+            this.node && this.node.destroy();
         }, 3000);
     }
 }

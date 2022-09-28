@@ -92,7 +92,7 @@ var Juice = /** @class */ (function (_super) {
             node.active = false;
         })));
         setTimeout(function () {
-            _this.node.destroy();
+            _this.node && _this.node.destroy();
         }, 3000);
     };
     __decorate([

@@ -28,6 +28,7 @@ var UICfg_1 = require("./cfg/UICfg");
 var Save_1 = require("./saveManager/Save");
 var SaveManager_1 = require("./saveManager/SaveManager");
 var UIUtils_1 = require("./ui/UIUtils");
+var math_utils_1 = require("./utils/math-utils");
 var Fruit = cc.Class({
     name: 'FruitItem',
     properties: {
@@ -58,6 +59,8 @@ var Game = /** @class */ (function (_super) {
         _this.lbScoreTip = null;
         _this.bottomNode = null;
         _this.btnOpenWheel = null;
+        _this.shootPos = null;
+        _this.fruitScale = 0.8; //水果缩放比例
         _this.creatY = 400; //生产球的位置
         _this.scoresTimer = null; //连击计时器
         _this.scoresTime = 1; //连击有效时间
@@ -94,13 +97,16 @@ var Game = /** @class */ (function (_super) {
         }, this);
         // 监听点击事件 todo 是否能够注册全局事件
         this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
-        this.initGame();
-        setInterval(function () {
-            //console.log("保存游戏");
-            _this.saveGame();
-        }, 10000);
-        //console.log("读取游戏");
-        this.readGame();
+        setTimeout(function () {
+            _this.creatY = math_utils_1.mathUtils.convertToParent(_this.shootPos, _this.fruitsNode).y;
+            _this.initGame();
+            setInterval(function () {
+                //console.log("保存游戏");
+                _this.saveGame();
+            }, 10000);
+            //console.log("读取游戏");
+            _this.readGame();
+        }, 0);
     };
     Game.prototype.initGame = function () {
         if (this.currentFruit) {
@@ -209,7 +215,7 @@ var Game = /** @class */ (function (_super) {
         fruit.getComponent(cc.RigidBody).type = cc.RigidBodyType.Static;
         fruit.getComponent(cc.PhysicsCircleCollider).radius = 0;
         this.fruitsNode.addChild(fruit);
-        fruit.scale = 0.6;
+        fruit.scale = this.fruitScale;
         // 有Fruit组件传入
         fruit.on('sameContact', this.onSameFruitContact.bind(this));
         return fruit;
@@ -244,7 +250,7 @@ var Game = /** @class */ (function (_super) {
             // 展示动画 todo 动画效果需要调整
             newFruit.scale = 0;
             cc.tween(newFruit).to(.5, {
-                scale: 0.6
+                scale: this.fruitScale
             }, {
                 easing: "backOut"
             }).start();
@@ -354,6 +360,9 @@ var Game = /** @class */ (function (_super) {
     __decorate([
         property(cc.Button)
     ], Game.prototype, "btnOpenWheel", void 0);
+    __decorate([
+        property(cc.Node)
+    ], Game.prototype, "shootPos", void 0);
     Game = __decorate([
         ccclass
     ], Game);

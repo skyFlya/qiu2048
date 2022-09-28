@@ -65,6 +65,5 @@ class SaveConfig {
         type: "number",
         default: 0
     }
-
 }
 export const Save: SaveConfig = new SaveConfig();

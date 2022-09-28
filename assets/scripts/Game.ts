@@ -6,6 +6,7 @@ import { HttpUrl } from "./platform/HttpUrl";
 import { Save } from "./saveManager/Save";
 import { SaveManager } from "./saveManager/SaveManager";
 import { UIUtils } from "./ui/UIUtils";
+import { mathUtils } from "./utils/math-utils";
 import { objectUtils } from "./utils/object-utils";
 
 const Fruit = cc.Class({
@@ -60,6 +61,11 @@ export default class Game extends cc.Component {
     @property(cc.Button)
     private btnOpenWheel: cc.Button = null;
 
+    @property(cc.Node)
+    private shootPos:cc.Node = null;
+
+    private fruitScale: number = 0.8;     //水果缩放比例
+
     private creatY: number = 400;       //生产球的位置
 
     private isCreating: boolean;        //是否在创建球中
@@ -100,8 +106,8 @@ export default class Game extends cc.Component {
     private targetScores = 700;         //下一个目标分数    
 
 
-    onLoad() {
-        App.uiCfgMgr.initByCfg(UICfg);
+    onLoad() {     
+        App.uiCfgMgr.initByCfg(UICfg);        
 
         UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
             //App.uiMgr.openUI(UICfg.PannelWheel.name);
@@ -112,15 +118,17 @@ export default class Game extends cc.Component {
         this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
 
 
-        this.initGame();
+        setTimeout(() => {
+            this.creatY = mathUtils.convertToParent(this.shootPos, this.fruitsNode).y;
+            this.initGame();
 
-
-        setInterval(() => {
-            //console.log("保存游戏");
-            this.saveGame();
-        }, 10000)
-        //console.log("读取游戏");
-        this.readGame();
+            setInterval(() => {
+                //console.log("保存游戏");
+                this.saveGame();
+            }, 10000)
+            //console.log("读取游戏");
+            this.readGame();
+        }, 0);                
     }
 
     initGame() {
@@ -140,7 +148,7 @@ export default class Game extends cc.Component {
     }
 
     checkGameOver() {
-        let endFruit = this.fruitsNode.children[this.fruitsNode.childrenCount - 1];        
+        let endFruit = this.fruitsNode.children[this.fruitsNode.childrenCount - 1];
         if (endFruit && endFruit.y >= this.creatY - 100) {
             this.initGame();
             return true;
@@ -247,7 +255,7 @@ export default class Game extends cc.Component {
         fruit.getComponent(cc.PhysicsCircleCollider).radius = 0
 
         this.fruitsNode.addChild(fruit);
-        fruit.scale = 0.6;
+        fruit.scale = this.fruitScale;
 
         // 有Fruit组件传入
         fruit.on('sameContact', this.onSameFruitContact.bind(this))
@@ -263,14 +271,14 @@ export default class Game extends cc.Component {
     }
 
     // 在指定位置生成水果
-    createFruitOnPos(x, y, type = 1) {        
+    createFruitOnPos(x, y, type = 1) {
         const fruit = this.createOneFruit(type)
         fruit.setPosition(cc.v2(x, y));
         return fruit
     }
 
     // 两个水果碰撞
-    onSameFruitContact({ self, other }) {        
+    onSameFruitContact({ self, other }) {
         other.node.off('sameContact') // 两个node都会触发，todo 看看有没有其他方法只展示一次的
 
         const id = other.getComponent('Fruit').id
@@ -291,7 +299,7 @@ export default class Game extends cc.Component {
             // 展示动画 todo 动画效果需要调整
             newFruit.scale = 0
             cc.tween(newFruit).to(.5, {
-                scale: 0.6
+                scale: this.fruitScale
             }, {
                 easing: "backOut"
             }).start()
