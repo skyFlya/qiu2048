@@ -59,6 +59,8 @@ var Game = /** @class */ (function (_super) {
         _this.lbScoreTip = null;
         _this.bottomNode = null;
         _this.btnOpenWheel = null;
+        _this.gameArea = null;
+        _this.offOronBG = null;
         _this.shootPos = null;
         _this.fruitScale = 0.8; //水果缩放比例
         _this.creatY = 400; //生产球的位置
@@ -93,10 +95,10 @@ var Game = /** @class */ (function (_super) {
         App_1.App.uiCfgMgr.initByCfg(UICfg_1.UICfg);
         UIUtils_1.UIUtils.addClickEvent(this.btnOpenWheel.node, function () {
             //App.uiMgr.openUI(UICfg.PannelWheel.name);
-            _this.initGame();
+            //this.initGame();
         }, this);
         // 监听点击事件 todo 是否能够注册全局事件
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
+        this.gameArea.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
         setTimeout(function () {
             _this.creatY = math_utils_1.mathUtils.convertToParent(_this.shootPos, _this.fruitsNode).y;
             _this.initGame();
@@ -360,6 +362,12 @@ var Game = /** @class */ (function (_super) {
     __decorate([
         property(cc.Button)
     ], Game.prototype, "btnOpenWheel", void 0);
+    __decorate([
+        property(cc.Node)
+    ], Game.prototype, "gameArea", void 0);
+    __decorate([
+        property(cc.Node)
+    ], Game.prototype, "offOronBG", void 0);
     __decorate([
         property(cc.Node)
     ], Game.prototype, "shootPos", void 0);

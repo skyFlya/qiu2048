@@ -62,7 +62,13 @@ export default class Game extends cc.Component {
     private btnOpenWheel: cc.Button = null;
 
     @property(cc.Node)
-    private shootPos:cc.Node = null;
+    private gameArea: cc.Node = null;
+
+    @property(cc.Node)
+    private offOronBG: cc.Node = null;
+
+    @property(cc.Node)
+    private shootPos: cc.Node = null;
 
     private fruitScale: number = 0.8;     //水果缩放比例
 
@@ -106,16 +112,16 @@ export default class Game extends cc.Component {
     private targetScores = 700;         //下一个目标分数    
 
 
-    onLoad() {     
-        App.uiCfgMgr.initByCfg(UICfg);        
+    onLoad() {
+        App.uiCfgMgr.initByCfg(UICfg);
 
         UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
             //App.uiMgr.openUI(UICfg.PannelWheel.name);
-            this.initGame();
+            //this.initGame();
         }, this);
 
         // 监听点击事件 todo 是否能够注册全局事件
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
+        this.gameArea.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
 
 
         setTimeout(() => {
@@ -128,7 +134,7 @@ export default class Game extends cc.Component {
             }, 10000)
             //console.log("读取游戏");
             this.readGame();
-        }, 0);                
+        }, 0);
     }
 
     initGame() {

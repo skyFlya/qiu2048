@@ -100,10 +100,9 @@ var SoundMgr = /** @class */ (function () {
     SoundMgr.prototype.playEffect = function (url, loop, volume) {
         if (loop === void 0) { loop = false; }
         if (volume === void 0) { volume = 1; }
-        var clip = cc.loader.getRes(url, cc.AudioClip);
-        if (clip && this.isSound) {
-            return cc.audioEngine.play(clip, loop, volume);
-        }
+        cc.assetManager.resources.load(url, cc.AudioClip, function (err, clip) {
+            cc.audioEngine.play(clip, loop, volume);
+        });
     };
     SoundMgr.prototype.playClickSound = function () {
         this.playEffect('common/sounds/click');

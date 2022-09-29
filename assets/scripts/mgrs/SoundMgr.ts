@@ -96,11 +96,10 @@ export class SoundMgr {
         cc.audioEngine.stopAllEffects();
     }   
 
-    public playEffect(url: string, loop: boolean = false, volume: number = 1): number {
-        const clip: cc.AudioClip = cc.loader.getRes(url, cc.AudioClip);
-        if (clip && this.isSound) {
-            return cc.audioEngine.play(clip, loop, volume);
-        }
+    public playEffect(url: string, loop: boolean = false, volume: number = 1) {
+        cc.assetManager.resources.load(url, cc.AudioClip, (err, clip: cc.AudioClip) => {            
+            cc.audioEngine.play(clip, loop, volume);
+        });      
     }
 
     public playClickSound(): void {
