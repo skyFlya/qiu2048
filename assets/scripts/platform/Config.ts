@@ -38,7 +38,7 @@ export namespace Config {
     /**预览开发配置项 */
     export let PHEAD = {
         _ts: +new Date().getTime(),
-        _appid: "1071201",
+        _appid: "40201",
         _sign: "c034e764dfefd8d2af90b57eb037872d",
         _ch: "300010",
         _av: '1.0.0',
@@ -46,7 +46,7 @@ export namespace Config {
         _imei: "imei1",
         _imei2: "imei2",
         _sk: "sk",
-        _token: "ID2WgKCGaTgBrlHphd51O2HexnEl5aMM33SXmqOWDwQ=",
+        _token: "HYfmf1vrQF4r17mazfEInuZFBk6mvlG5",
         dv: '1.0.0.0',        
     }
 }

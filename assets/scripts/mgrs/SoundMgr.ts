@@ -1,4 +1,5 @@
 import { LocalStorageIDCfg } from "../cfg/LocalStorageIDCfg";
+import { objectUtils } from "../utils/object-utils";
 
 
 export class SoundMgr {
@@ -97,13 +98,18 @@ export class SoundMgr {
     }   
 
     public playEffect(url: string, loop: boolean = false, volume: number = 1) {
-        cc.assetManager.resources.load(url, cc.AudioClip, (err, clip: cc.AudioClip) => {            
-            cc.audioEngine.play(clip, loop, volume);
-        });      
+        objectUtils.loadRes(url, cc.AudioClip, {
+            onComplete:(err, clip: cc.AudioClip) => {            
+                cc.audioEngine.play(clip, loop, volume);
+            }
+        })
+        // cc.assetManager.resources.load(url, cc.AudioClip, (err, clip: cc.AudioClip) => {            
+        //     cc.audioEngine.play(clip, loop, volume);
+        // });      
     }
 
     public playClickSound(): void {
-        this.playEffect('common/sounds/click');
+        //this.playEffect('common/sounds/click');
     }
 
 }

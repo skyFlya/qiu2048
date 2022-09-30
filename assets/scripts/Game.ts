@@ -1,6 +1,7 @@
 import { App } from "./app/App";
 import { UICfg } from "./cfg/UICfg";
 import { SoundMgr } from "./mgrs/SoundMgr";
+import TimeMgr from "./mgrs/TimeMgr";
 import { httpClient } from "./platform/HttpClient";
 import { HttpUrl } from "./platform/HttpUrl";
 import { Save } from "./saveManager/Save";
@@ -113,10 +114,26 @@ export default class Game extends cc.Component {
 
 
     onLoad() {
+        httpClient.getInstance().httpPost(HttpUrl.config, {
+            
+        }, {
+            success: () => {
+                console.log("成功")
+            },
+            fail: () => {
+                console.log("失败")
+            },
+            final: () => {
+                console.log("完成")
+            }
+        })
+
+
+
         App.uiCfgMgr.initByCfg(UICfg);
 
         UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
-            //App.uiMgr.openUI(UICfg.PannelWheel.name);
+            App.uiMgr.openUI(UICfg.PannelWheel.name);
             //this.initGame();
         }, this);
 

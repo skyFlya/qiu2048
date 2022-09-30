@@ -29,7 +29,7 @@ export interface HttpError {
     reason: any
 }
 
-let httpHost = "http://composite.qufenqian-webgame.web-application.gz.vipc.me"
+let httpHost = "http://game2048220926.qufenqian-webgame.web-application.gz.vipc.me"
 
 export class httpClient {
     private static _instance: httpClient = null;
@@ -152,14 +152,13 @@ export class httpClient {
             } catch (error) {
                 error(error);
             }
-        };
-        
+        };                
+        //Accept: text/plain
+
         xhr.open("POST", url);
-        xhr.timeout = 10 * 1000; //超时10秒
-        xhr.setRequestHeader("Content-Type", "application/json;charset=utf-8");
+        xhr.timeout = 10 * 1000; //超时10秒        
+        xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(JSON.stringify(body));
-
     }
-
 }
 

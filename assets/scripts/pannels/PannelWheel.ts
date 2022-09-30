@@ -23,8 +23,8 @@ export default class PannelWheel extends UIBase {
     @property(cc.Button)
     private btnClose: cc.Button = null;
 
-    @property(cc.SpriteFrame)
-    private selectImg: cc.SpriteFrame[] = [];
+    @property(cc.Node)
+    private selectImg: cc.Node = null;
 
     private wheelIsRunning = false;
     private maxPrizeIndex: number;
@@ -41,10 +41,17 @@ export default class PannelWheel extends UIBase {
         this._uiName = UICfg.PannelWheel.name;
     }
 
+    protected onEnable(): void {
+        this.selectImg.active = false;
+    }
+
     onLoad() {
         UIUtils.addClickEvent(this.btnChou.node, this.onClickChou, this);
         UIUtils.addClickEvent(this.btnClose.node, this.onCloseClick, this);
 
+
+
+        
 
         this.maxPrizeIndex = this.prizeFrameNode.children.length;
     }
@@ -55,14 +62,15 @@ export default class PannelWheel extends UIBase {
             if (this.currentFps >= this.speed) {
                 // 转了一格
                 this.turnNumber--;
-                if (this.turnNumber <= 0) {
+                this.currentFps = 0;
+                if (this.turnNumber <= 0) {                    
                     if (this.turnId >= 0) {
                         if (this.hasWheelDraw) {
                             this.wheelIsRunning = false;
                             this.hasWheelDraw = false;
                             this.openPrizeWin();
                         } else {
-                            this.hasWheelDraw = true;
+                            this.hasWheelDraw = true;                            
                         }
                         this.turnNumber = this.maxPrizeIndex + (this.maxPrizeIndex - this.getPrizeIndex) + (this.getPrizeIndex + (this.turnId - this.getPrizeIndex));
                         if (this.turnNumber >= 16) {
@@ -83,23 +91,26 @@ export default class PannelWheel extends UIBase {
                     let childEnd = this.prizeFrameNode.children[this.getPrizeIndex];
 
                     if (child && childEnd) {
-                        child.getComponent(cc.Sprite).spriteFrame = this.selectImg[0];
-                        childEnd.getComponent(cc.Sprite).spriteFrame = this.selectImg[1];
+                        // child.getComponent(cc.Sprite).spriteFrame = this.selectImg[0];
+                        // childEnd.getComponent(cc.Sprite).spriteFrame = this.selectImg[1];
+                        if(!this.selectImg.active){
+                            this.selectImg.active = true;
+                        }                        
+                        this.selectImg.setPosition(childEnd.getPosition());
                     }
 
 
 
-                    // 调整速度
-                    this.currentFps = 0;
+                    // 调整速度                    
                     if (this.hasWheelDraw) {
                         // this.speed++;
-                        this.speed = Math.sqrt(Math.pow((this.speed + 1), 2) + 16);
+                        this.speed = Math.sqrt(Math.pow((this.speed + 1), 2) + 16);                        
                     }
                 }
                 else {
                     let child = this.prizeFrameNode.children[this.getPrizeIndex];
-                    if (child) {
-                        child.getComponent(cc.Sprite).spriteFrame = this.selectImg[1];
+                    if (child) {                        
+                        this.selectImg.setPosition(child.getPosition());
                     }
                 }
             }
@@ -112,7 +123,7 @@ export default class PannelWheel extends UIBase {
 
     private onClickChou() {
         let self = this;
-        this.turnId = Math.floor(Math.random() * 5);
+        this.turnId = Math.floor(Math.random() * 5);        
 
         this.turnNumber = this.maxPrizeIndex * 2 - this.turnId;
         this.speed = 5;
