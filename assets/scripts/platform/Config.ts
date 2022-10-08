@@ -46,7 +46,7 @@ export namespace Config {
         _imei: "imei1",
         _imei2: "imei2",
         _sk: "sk",
-        _token: "HYfmf1vrQF4r17mazfEInuZFBk6mvlG5",
+        _token: "OL4FTGMKsURGWBvvc32Ij+ZFBk6mvlG5",
         dv: '1.0.0.0',        
     }
 }

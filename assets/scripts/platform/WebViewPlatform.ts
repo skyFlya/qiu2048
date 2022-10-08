@@ -28,7 +28,7 @@ export default class WebViewPlatform {
         return this.callWebView(funcName, params, callback);
     };
 
-    private callWebView(methodName: string, args, cb?) {
+    private callWebView(methodName: string, args, cb?) {        
         let ret = '';
         if (typeof args == 'function') {
             cb = args;
@@ -56,6 +56,13 @@ export default class WebViewPlatform {
         }
         return ret;
     };
+
+    public getDeviceInfo() {
+        let value = this.call('getDeviceInfo', 750);
+        console.log("返回", value);
+        return value;
+    }
+
 
     private callBrowser(method, args) {
         if (method == 'launch') {
@@ -125,7 +132,7 @@ export default class WebViewPlatform {
      * @param obj 神策参数
      * @param callback 回调
      */
-     track(obj: any, callback?: Function) {
+    track(obj: any, callback?: Function) {
         this.jsCall('track', obj, callback);
     }
 

@@ -29,6 +29,8 @@ export interface HttpError {
     reason: any
 }
 
+//对应正式域名：http://nbs1.qufenqian.vip
+
 let httpHost = "http://game2048220926.qufenqian-webgame.web-application.gz.vipc.me"
 
 export class httpClient {
@@ -68,7 +70,7 @@ export class httpClient {
         this.request(finalurl, finalData,
             _success => {                
                 if (_success && _success.statuscode === 0) {
-                    success && success(_success.data);
+                    success && success(_success);
                     final && final(_success);
                 } else {
                     fail && fail(_success);

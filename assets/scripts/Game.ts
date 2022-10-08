@@ -4,6 +4,7 @@ import { SoundMgr } from "./mgrs/SoundMgr";
 import TimeMgr from "./mgrs/TimeMgr";
 import { httpClient } from "./platform/HttpClient";
 import { HttpUrl } from "./platform/HttpUrl";
+import WebViewPlatform from "./platform/WebViewPlatform";
 import { Save } from "./saveManager/Save";
 import { SaveManager } from "./saveManager/SaveManager";
 import { UIUtils } from "./ui/UIUtils";
@@ -66,10 +67,10 @@ export default class Game extends cc.Component {
     private gameArea: cc.Node = null;
 
     @property(cc.Node)
-    private offOronBG: cc.Node = null;
-
-    @property(cc.Node)
     private shootPos: cc.Node = null;
+
+    @property(cc.Sprite)
+    private rectFilled: cc.Sprite = null;
 
     private fruitScale: number = 0.8;     //水果缩放比例
 
@@ -91,12 +92,15 @@ export default class Game extends cc.Component {
 
     private ljCount = 0;                //连击次数
 
+    private targetScores = 700;         //下一个目标分数    
+
     private _curScores = 0;             //当前总分
 
     public set curScores(value: number) {
         this._curScores = value;
         if (this.targetScores > this.curScores) {
             this.lbScores.string = `${this.curScores}/${this.targetScores}`;
+            this.rectFilled.fillRange = this.curScores / this.targetScores > 1 ? 1 : this.curScores / this.targetScores;
             this.lbScoreTip.string = `再得<color = #CF5B5B>${this.targetScores - this.curScores}</c>分，即可获得额外提现机会`;
         }
         else {
@@ -110,15 +114,12 @@ export default class Game extends cc.Component {
     }
 
 
-    private targetScores = 700;         //下一个目标分数    
-
-
     onLoad() {
-        httpClient.getInstance().httpPost(HttpUrl.config, {
-            
+        httpClient.getInstance().httpPost(HttpUrl.getVersion, {
+
         }, {
             success: () => {
-                console.log("成功")
+                this.initHttp();
             },
             fail: () => {
                 console.log("失败")
@@ -133,7 +134,13 @@ export default class Game extends cc.Component {
         App.uiCfgMgr.initByCfg(UICfg);
 
         UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
-            App.uiMgr.openUI(UICfg.PannelWheel.name);
+            if (this.curScores >= this.targetScores) {
+                App.uiMgr.openUI(UICfg.PannelWheel.name);
+            }
+            else {
+                App.toastMgr.showToast(`再得${this.targetScores - this.curScores}分，即可获得额外提现机会`);
+            }
+
             //this.initGame();
         }, this);
 
@@ -152,7 +159,38 @@ export default class Game extends cc.Component {
             //console.log("读取游戏");
             this.readGame();
         }, 0);
+
+        
+        //WebViewPlatform.getInstance().getDeviceInfo();
+
     }
+
+    initHttp() {
+        httpClient.getInstance().httpPost(HttpUrl.config, {
+
+        }, {
+            success: () => {
+
+            },
+            fail: () => {
+
+            },
+        })
+
+        httpClient.getInstance().httpPost(HttpUrl.configIndex, {
+
+        }, {
+            success: (res) => {
+                let user = res.model.user;
+                this.targetScores = user.needFinishScore;
+                this.curScores = user.currentScore;
+            },
+            fail: () => {
+
+            },
+        })
+    }
+
 
     initGame() {
         if (this.currentFruit) {
@@ -333,12 +371,55 @@ export default class Game extends cc.Component {
 
         if (!this.scoresTimer) {
             this.initLjTime();
+
+            httpClient.getInstance().httpPost(HttpUrl.hecheng, {
+                ballNumber: nextId
+            }, {
+                success: (res) => {
+                    let user = res.model.user;
+                    this.targetScores = user.needFinishScore;
+                    this.curScores = user.currentScore;
+                },
+                fail: () => {
+
+                },
+                final: () => {
+                    console.log("完成")
+                }
+            })
         }
         this.setLjTimer();
         let oneljScores = this.getljScores(nextId);
         this.ljCount++;
-        this.ljScores += oneljScores;
-        this.curScores += this.ljScores;
+        //this.ljScores += oneljScores;
+        //this.curScores += this.ljScores;
+    }
+
+    private getFruitLv(index) {
+        switch (index) {
+            case 1:
+                return 2;
+            case 2:
+                return 4;
+            case 3:
+                return 8;
+            case 4:
+                return 16;
+            case 5:
+                return 32;
+            case 6:
+                return 64;
+            case 7:
+                return 128;
+            case 8:
+                return 256;
+            case 9:
+                return 512;
+            case 10:
+                return 1024;
+            default:
+                break;
+        }
     }
 
     //设置连击初始数据
@@ -360,9 +441,6 @@ export default class Game extends cc.Component {
         this.ljScores = 0;
         this.scoresTimer = null;
         this.isLjIng = false;
-        if (this.curScores >= this.targetScores) {
-
-        }
     }
 
     //获得连击分数
@@ -401,8 +479,6 @@ export default class Game extends cc.Component {
             }
         }
         SaveManager.Instance().setItem(Save.fruitsPos, fruitPosArray);
-
-        SaveManager.Instance().setItem(Save.gameScores, this.curScores);
     }
 
     //游戏读取
@@ -412,9 +488,7 @@ export default class Game extends cc.Component {
             let data = gameData[i];
             this.startFruitPhysics(this.createFruitOnPos(data.pos.x, data.pos.y, data.id))
         }
-
         this.fruitCount = gameData.length;
-        this.curScores = SaveManager.Instance().getItem(Save.gameScores);
     }
 
 }
