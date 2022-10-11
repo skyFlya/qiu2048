@@ -1,7 +1,12 @@
 import { App } from "./app/App";
+import { EventIDCfg } from "./cfg/EventIDCfg";
+import { GameDcfg } from "./cfg/GameDcfg";
 import { UICfg } from "./cfg/UICfg";
+import { PlayerData } from "./global/PlayerData";
+import { EventMgr } from "./mgrs/EventMgr";
 import { SoundMgr } from "./mgrs/SoundMgr";
 import TimeMgr from "./mgrs/TimeMgr";
+import PannelTip2 from "./pannels/PannelTip2";
 import { httpClient } from "./platform/HttpClient";
 import { HttpUrl } from "./platform/HttpUrl";
 import WebViewPlatform from "./platform/WebViewPlatform";
@@ -69,8 +74,43 @@ export default class Game extends cc.Component {
     @property(cc.Node)
     private shootPos: cc.Node = null;
 
+    @property(cc.Widget)
+    private topNode: cc.Widget = null;
+
     @property(cc.Sprite)
     private rectFilled: cc.Sprite = null;
+
+    @property(cc.Button)
+    private btnTest: cc.Button = null;
+
+    @property(cc.Button)
+    private btnClickMySet: cc.Button = null;
+
+    @property(cc.SpriteFrame)
+    private btnWheelSpr: cc.SpriteFrame[] = [];
+
+    @property(cc.Button)
+    private btnCashOut: cc.Button = null;
+
+    @property(cc.Button)
+    private btnCashOut2: cc.Button = null;
+
+    @property(cc.Label)
+    private lbAmount:cc.Label = null;
+
+    @property(cc.Label)
+    private lb2048Count:cc.Label = null;
+
+    @property(cc.Label)
+    private lbDayNeed2048:cc.Label = null;
+
+    @property(cc.RichText)
+    private lbCashOutPad:cc.RichText = null;
+
+    @property(cc.Node)
+    private cashOutPad:cc.Node = null;
+
+    private btnWheelAni = false;
 
     private fruitScale: number = 0.8;     //水果缩放比例
 
@@ -102,17 +142,28 @@ export default class Game extends cc.Component {
             this.lbScores.string = `${this.curScores}/${this.targetScores}`;
             this.rectFilled.fillRange = this.curScores / this.targetScores > 1 ? 1 : this.curScores / this.targetScores;
             this.lbScoreTip.string = `再得<color = #CF5B5B>${this.targetScores - this.curScores}</c>分，即可获得额外提现机会`;
+            this.btnOpenWheel.node.getComponent(cc.Sprite).spriteFrame = this.btnWheelSpr[0];
+            if (this.btnWheelAni) {
+                this.btnOpenWheel.node.stopAllActions();
+                this.btnOpenWheel.node.scale = 1;
+                this.btnOpenWheel.node.getComponent(cc.Sprite).spriteFrame = this.btnWheelSpr[0];
+                this.btnWheelAni = false;
+            }
         }
         else {
             this.lbScores.string = "可提现";
             this.lbScoreTip.string = "";
+            if (!this.btnWheelAni) {
+                this.btnOpenWheel.node.getComponent(cc.Sprite).spriteFrame = this.btnWheelSpr[1];
+                cc.tween(this.btnOpenWheel.node).repeatForever(cc.tween().to(0.3, { scale: 1.2 }).to(0.3, { scale: 1 })).start();
+                this.btnWheelAni = true;
+            }
         }
     }
 
     public get curScores(): number {
         return this._curScores;
     }
-
 
     onLoad() {
         httpClient.getInstance().httpPost(HttpUrl.getVersion, {
@@ -127,25 +178,12 @@ export default class Game extends cc.Component {
             final: () => {
                 console.log("完成")
             }
-        })
+        })      
 
+        this.addEvent();
 
 
         App.uiCfgMgr.initByCfg(UICfg);
-
-        UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
-            if (this.curScores >= this.targetScores) {
-                App.uiMgr.openUI(UICfg.PannelWheel.name);
-            }
-            else {
-                App.toastMgr.showToast(`再得${this.targetScores - this.curScores}分，即可获得额外提现机会`);
-            }
-
-            //this.initGame();
-        }, this);
-
-        // 监听点击事件 todo 是否能够注册全局事件
-        this.gameArea.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
 
 
         setTimeout(() => {
@@ -160,9 +198,59 @@ export default class Game extends cc.Component {
             this.readGame();
         }, 0);
 
-        
-        //WebViewPlatform.getInstance().getDeviceInfo();
 
+        let liuhai = WebViewPlatform.getInstance().getDeviceInfo();
+        this.topNode.top += liuhai.notchBarHeight;
+    }
+
+    addEvent() {
+        UIUtils.addClickEvent(this.btnOpenWheel.node, () => {
+            if (this.curScores >= this.targetScores) {
+                App.uiMgr.openUI(UICfg.PannelWheel.name);
+            }
+            else {
+                App.toastMgr.showToast(`再得${this.targetScores - this.curScores}分，即可获得额外提现机会`);
+            }
+        }, this);
+
+        UIUtils.addClickEvent(this.btnClickMySet.node, () => {
+            App.uiMgr.openUI(UICfg.PannelMySet.name);
+        }, this);
+
+        UIUtils.addClickEvent(this.btnCashOut.node, () => {
+            App.uiMgr.openUI(UICfg.PannelCashOut.name);
+        }, this);
+
+        UIUtils.addClickEvent(this.btnCashOut2.node, () => {
+            App.uiMgr.openUI(UICfg.PannelCashOut.name);
+        }, this);
+
+        UIUtils.addClickEvent(this.btnTest.node, () => {
+            httpClient.getInstance().httpPost(HttpUrl.hecheng, {
+                ballNumber: 11
+            }, {
+                success: (res) => {
+                    let user = res.model.user;
+                    this.targetScores = user.needFinishScore;
+                    this.curScores = user.currentScore;
+                },
+                fail: () => {
+
+                },
+                final: () => {
+                    console.log("完成")
+                }
+            })
+        }, this);
+
+
+        // 监听点击事件 todo 是否能够注册全局事件
+        this.gameArea.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
+
+        EventMgr.on(EventIDCfg.UPDATE_WHEEL_TARGET, (scrore: number) => {
+            this.targetScores = scrore;
+            this.curScores = this.curScores;
+        }, this);
     }
 
     initHttp() {
@@ -184,11 +272,43 @@ export default class Game extends cc.Component {
                 let user = res.model.user;
                 this.targetScores = user.needFinishScore;
                 this.curScores = user.currentScore;
+
+                let ext = res.ext;
+                console.log("用户数据", ext);
+                this.lbAmount.string = ext.cash + "元";
+                this.lb2048Count.string = res.model.totalUserActive + "";
+                this.lbDayNeed2048.string = `今日合成:      x${res.model.todayUserActive}`;
+
+                PlayerData.gold = ext.cash;
+                PlayerData.ball2048 = res.model.totalUserActive;
             },
             fail: () => {
 
             },
         })
+       
+        this.checkMinCashOut();
+    }
+
+    private checkMinCashOut(){
+        httpClient.getInstance().httpPost(HttpUrl.cashOutMin, {
+
+        }, {
+            success: (res) => {
+                if(res.model.coin >= res.ext.coin){
+                    let pad = ((res.model.coin - res.ext.coin) / GameDcfg.EXCHANGE).toFixed(2);            
+                    this.lbCashOutPad.string = `再赚<color = #FF170C>12345</c>元，可提现<color = #FF170C>${res.model.coin / GameDcfg.EXCHANGE}</c>元`
+
+                    this.cashOutPad.active = true;
+                }                
+                else{
+                    this.cashOutPad.active = false;
+                }
+            },
+            fail: () => {
+
+            },
+        }, true)
     }
 
 

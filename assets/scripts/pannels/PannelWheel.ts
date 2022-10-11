@@ -5,12 +5,17 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
+import { App } from "../app/App";
+import { EventIDCfg } from "../cfg/EventIDCfg";
 import { UICfg } from "../cfg/UICfg";
+import { EventMgr } from "../mgrs/EventMgr";
 import { httpClient } from "../platform/HttpClient";
 import { HttpUrl } from "../platform/HttpUrl";
 import UIBase from "../ui/UIBase";
 import { UIUtils } from "../ui/UIUtils";
 import { random } from "../utils/random";
+import PannelTip2 from "./PannelTip2";
+import PannelTip4 from "./PannelTip4";
 
 const { ccclass, property } = cc._decorator;
 
@@ -37,7 +42,10 @@ export default class PannelWheel extends UIBase {
     private turnId = 0;// 下发的要转到的坑位
     private hasWheelDraw = false;// 与turnId配合
     private getPrizeIndex = 0;// 当前选中坑位（实际坑位从1开始）     
+
+
     private lotteryType = 0;   //1-红包货币，当阶段红包掉落 2-提现机会，按照提现配置ID对应 3-2048球
+    private chouJiangData = null;
 
     constructor() {
         super();
@@ -108,7 +116,7 @@ export default class PannelWheel extends UIBase {
                             this.turnNumber = this.maxPrizeIndex;
                             if (this.turnNumber >= 16) {
                                 this.turnNumber -= 8;
-                            }                            
+                            }
                         }
                     }
                 }
@@ -118,55 +126,74 @@ export default class PannelWheel extends UIBase {
 
     //1-红包货币，当阶段红包掉落 2-提现机会，按照提现配置ID对应 3-2048球
     private openPrizeWin() {
-        if(this.lotteryType == 1){
-            
+        console.log("11111111");
+        if (this.lotteryType == 1) {
+            App.uiMgr.openUI(UICfg.PannelTip2.name, (ui) => {
+                let model = this.chouJiangData;
+                let user = this.chouJiangData.user;
+                ui.getComponent(PannelTip2).setData(model.lotteryTypeDesc, model.coin, user.needFinishScore - user.currentScore, () => {
+                    this.close();
+                });
+            });
         }
-        else if(this.lotteryType == 2){
-
+        else if (this.lotteryType == 2) {
+            App.uiMgr.openUI(UICfg.PannelTip2.name, (ui) => {
+                let model = this.chouJiangData;
+                let user = this.chouJiangData.user;
+                ui.getComponent(PannelTip2).setData(model.lotteryTypeDesc, model.coin, user.needFinishScore - user.currentScore, () => {
+                    this.close();
+                });
+            });
         }
-        else if(this.lotteryType == 3){
-
+        else if (this.lotteryType == 3) {
+            App.uiMgr.openUI(UICfg.PannelTip4.name, (ui) => {
+                ui.getComponent(PannelTip4).setData(() => {
+                    this.close();
+                });
+            });
         }
     }
 
-    private onClickChou() {        
-        if(!this.selectImg.active){
+    private onClickChou() {
+        if (!this.selectImg.active) {
             httpClient.getInstance().httpPost(HttpUrl.lottery, {
-            
+
             }, {
                 success: (res) => {
                     let model = res.model;
+                    this.chouJiangData = model;
                     this.lotteryType = model.lotteryType;
-                    this.turnId = this.setIndex()
-                    console.log("抽中", this.turnId);
-            
+                    this.turnId = this.setIndex();
+
+                    EventMgr.emit(EventIDCfg.UPDATE_WHEEL_TARGET, model.user.needFinishScore);
+
                     this.turnNumber = this.maxPrizeIndex * 2 + this.turnId - this.getPrizeIndex;
                     this.speed = 5;
-            
+
                     this.wheelIsRunning = true;
                 },
                 fail: () => {
-    
+
                 },
                 final: () => {
                     console.log("完成")
                 }
-            })  
-        }     
+            })
+        }
     }
 
     /**
      * 
      */
-    private setIndex(){
-        if(this.lotteryType == 1){
+    private setIndex() {
+        if (this.lotteryType == 1) {
             return 6;
         }
-        else if(this.lotteryType == 2){
+        else if (this.lotteryType == 2) {
             let arr = [0, 1, 2, 3, 5, 7];
             return arr[random.findRandomBase(0, arr.length)];
         }
-        else if(this.lotteryType == 3){
+        else if (this.lotteryType == 3) {
             return 4;
         }
     }

@@ -20,6 +20,8 @@ export namespace Config {
     /**游戏版本 */
     export let version = " 1.195";
 
+    export let isTest = true;
+
     /**服务器配置项 */
     export let serverUrlConfig = {
         /**开发服 */
@@ -49,5 +51,6 @@ export namespace Config {
         _token: "OL4FTGMKsURGWBvvc32Ij+ZFBk6mvlG5",
         dv: '1.0.0.0',        
     }
+
 }
 

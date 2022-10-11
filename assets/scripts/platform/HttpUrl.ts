@@ -19,10 +19,6 @@ export class HttpUrl {
     static hecheng: HttpUrlConfig = {            //合成接口1、累积积分2、经验+1
         url: `/game/compound-ball/synthesis-of-the-ball`,
     }
-    // {
-    //     "ballNumber": 0
-    // }
-
 
     static redAward: HttpUrlConfig = {            //红包奖励接口
         url: `/game/compound-ball/hongbao-award`,
@@ -31,6 +27,15 @@ export class HttpUrl {
     static lottery: HttpUrlConfig = {            //抽奖接口（积分满足）
         url: `/game/compound-ball/lottery`,
     }
+
+    static cashOutList: HttpUrlConfig = {            //提现列表
+        url: `/v2/Withdraw/WithdrawList2`,
+    }
+
+    static cashOutMin: HttpUrlConfig = {             //用户当前最小提现额度
+        url: `/v2/Withdraw/MinWithDrawData`,
+    }
+
 
 }
 

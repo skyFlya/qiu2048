@@ -17,6 +17,8 @@ export default class PannelTip1 extends UIBase {
     @property(cc.Label)
     private lbAmount:cc.Label = null;
 
+    private closeCd = null;
+
     constructor() {
         super();
         this._uiName = UICfg.PannelTip1.name;
@@ -25,6 +27,11 @@ export default class PannelTip1 extends UIBase {
     onLoad(){
         UIUtils.addClickEvent(this.btnVideo1.node, this.onClicVideo1, this);
         UIUtils.addClickEvent(this.btnVideo2.node, this.onClicVideo2, this);
+    }
+
+    onDisable() {
+        this.closeCd && this.closeCd();
+        this.closeCd = null;
     }
 
     setData(amount:number){

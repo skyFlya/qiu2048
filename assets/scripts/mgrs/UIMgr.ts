@@ -188,12 +188,12 @@ export class UIMgr {
         uiBase.node.zIndex = cfg.zIndex;
         uiBase.show(()=>{});
         callback && callback(uiBase);
-        EventMgr.emit(EventIDCfg.PANNLE_SHOW, {name: name});
+        //EventMgr.emit(EventIDCfg.PANNLE_SHOW, {name: name});
     }
 
     private closeAndShowNext(uiBase: UIBase, name: string, tryShowNext: boolean, callback: (uiBase: UIBase) => void): void {
         callback && callback(uiBase);
-        EventMgr.emit(EventIDCfg.PANNEL_CLOSE, {name: name});
+        //EventMgr.emit(EventIDCfg.PANNEL_CLOSE, {name: name});
         tryShowNext && this.tryShowNextUI();
     }
 
